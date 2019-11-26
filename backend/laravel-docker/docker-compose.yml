@@ -1,0 +1,34 @@
+version: "3.4"
+services:
+  app:
+    container_name: app
+    volumes:
+      - "./:/app"
+      - "./docker/php/.user.ini:/usr/local/etc/php/php.ini"
+    working_dir: /app
+    command: "php artisan serve --host=0.0.0.0 --port=8000"
+    ports:
+      - 8000:8000
+    build:
+      context: docker/php
+      dockerfile: dev.Dockerfile
+    links:
+      - redis
+  db:
+    image: mariadb
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+      MYSQL_DATABASE: ${DB_DATABASE}
+    ports:
+      - 3306:3306
+    volumes:
+      - "db-data:/var/lib/mysql/data"
+#  rabbitmq:
+#    image: bitnami/rabbitmq:latest
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+
+volumes:
+  db-data: {}
